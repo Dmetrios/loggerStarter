@@ -6,9 +6,8 @@ import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.cglib.proxy.Enhancer;
 import org.springframework.cglib.proxy.MethodInterceptor;
 import org.springframework.cglib.proxy.MethodProxy;
-import org.springframework.stereotype.Component;
 import ru.aston.investmentloggerprofilingstarter.annotation.Profiling;
-import ru.aston.investmentloggerprofilingstarter.mbean.controller.ProfilingController;
+import ru.aston.investmentloggerprofilingstarter.mbean.ProfilingController;
 
 import javax.management.ObjectName;
 import java.lang.management.ManagementFactory;
@@ -21,8 +20,6 @@ import java.util.stream.IntStream;
 public class ProfilingAnnotationBeanPostProcessor implements BeanPostProcessor {
     private ConcurrentHashMap<String, Class> map = new ConcurrentHashMap<>();
     private ProfilingController profilingController = new ProfilingController();
-
-
 
     public ProfilingAnnotationBeanPostProcessor() throws Exception {
         ManagementFactory.getPlatformMBeanServer().registerMBean(profilingController, new ObjectName("profiling", "name", "controller"));

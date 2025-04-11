@@ -1,6 +1,4 @@
-package ru.aston.investmentloggerprofilingstarter.mbean.controller;
-
-import ru.aston.investmentloggerprofilingstarter.mbean.ProfilingControllerMBean;
+package ru.aston.investmentloggerprofilingstarter.mbean;
 
 public class ProfilingController implements ProfilingControllerMBean {
     private boolean enabled;
@@ -9,6 +7,7 @@ public class ProfilingController implements ProfilingControllerMBean {
         return enabled;
     }
 
+    @Override
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
     }
