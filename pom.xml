@@ -10,7 +10,7 @@
     </parent>
     <groupId>ru.aston</groupId>
     <artifactId>investment-logger-profiling-starter</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.0.1</version>
     <name>investment-logger-profiling-starter</name>
     <description>investment-logger-profiling-starter</description>
     <url/>

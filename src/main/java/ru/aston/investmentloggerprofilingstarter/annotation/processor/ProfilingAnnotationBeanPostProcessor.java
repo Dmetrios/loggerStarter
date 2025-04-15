@@ -1,6 +1,8 @@
 package ru.aston.investmentloggerprofilingstarter.annotation.processor;
 
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.cglib.proxy.Enhancer;
@@ -10,16 +12,17 @@ import ru.aston.investmentloggerprofilingstarter.annotation.Profiling;
 import ru.aston.investmentloggerprofilingstarter.mbean.ProfilingController;
 
 import javax.management.ObjectName;
+import java.lang.annotation.Annotation;
 import java.lang.management.ManagementFactory;
 import java.lang.reflect.*;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.IntStream;
 
-@Slf4j
 public class ProfilingAnnotationBeanPostProcessor implements BeanPostProcessor {
     private ConcurrentHashMap<String, Class> map = new ConcurrentHashMap<>();
     private ProfilingController profilingController = new ProfilingController();
+    private Annotation[] annotation;
 
     public ProfilingAnnotationBeanPostProcessor() throws Exception {
         ManagementFactory.getPlatformMBeanServer().registerMBean(profilingController, new ObjectName("profiling", "name", "controller"));
@@ -30,6 +33,7 @@ public class ProfilingAnnotationBeanPostProcessor implements BeanPostProcessor {
         Class<?> beanClass = bean.getClass();
         if(beanClass.isAnnotationPresent(Profiling.class)) {
             map.put(beanName, beanClass);
+            annotation = beanClass.getAnnotations();
         }
         return bean;
     }
@@ -38,23 +42,28 @@ public class ProfilingAnnotationBeanPostProcessor implements BeanPostProcessor {
     public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
         Class<?> beanClass = map.get(beanName);
         if(beanClass != null) {
+            for(Annotation annotation : beanClass.getAnnotations()) {
+                System.out.println(annotation.getClass().getName());
+            }
+            Logger logger = LoggerFactory.getLogger(beanClass);
             if(beanClass.getInterfaces().length > 0) {
                 return Proxy.newProxyInstance(beanClass.getClassLoader(), beanClass.getInterfaces(), new InvocationHandler() {
                     @Override
                     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
                         String result = getResultString(method, args);
+
                         if (profilingController.isEnabled()) {
                             long start = System.currentTimeMillis();
-                            log.info(method.getName() + " - start; " + result + "Profiling: " + start);
+                            logger.info(method.getName() + " - start; " + result + "Profiling: " + start);
                             Object retVal = Optional.ofNullable(method.invoke(bean, args)).orElse("");
                             long end = System.currentTimeMillis();
-                            log.info(method.getName() + " - end; " + retVal + "Profiling: " + end);
+                            logger.info(method.getName() + " - end; " + retVal + "Profiling: " + end);
                             return retVal;
                         }
                         else {
-                            log.info(method.getName() + " - start; " + result);
+                            logger.info(method.getName() + " - start; " + result);
                             Object retVal = Optional.ofNullable(method.invoke(bean, args)).orElse("");
-                            log.info(method.getName() + " - end; " + retVal);
+                            logger.info(method.getName() + " - end; " + retVal);
                             return retVal;
                         }
                     }
@@ -69,16 +78,16 @@ public class ProfilingAnnotationBeanPostProcessor implements BeanPostProcessor {
                         String result = getResultString(method, args);
                         if (profilingController.isEnabled()) {
                             long start = System.currentTimeMillis();
-                            log.info(method.getName() + " - start; " + result + "Profiling: " + start);
+                            logger.info(method.getName() + " - start; " + result + "Profiling: " + start);
                             Object retVal = Optional.ofNullable(method.invoke(bean, args)).orElse("");
                             long end = System.currentTimeMillis();
-                            log.info(method.getName() + " - end; " + retVal + "Profiling: " + end);
+                            logger.info(method.getName() + " - end; " + retVal + "Profiling: " + end);
                             return retVal;
                         }
                         else {
-                            log.info(method.getName() + " - start; " + result);
+                            logger.info(method.getName() + " - start; " + result);
                             Object retVal = Optional.ofNullable(method.invoke(bean, args)).orElse("");
-                            log.info(method.getName() + " - end; " + retVal);
+                            logger.info(method.getName() + " - end; " + retVal);
                             return retVal;
                         }
                     }

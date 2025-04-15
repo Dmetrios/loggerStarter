@@ -1,0 +1,7 @@
+logging:
+  level:
+    root: INFO                         # Уровень логирования для корневого логгера
+  pattern:
+    console: "%(%d{ISO8601}) %highlight(%-5level) [%magenta(%t)] %yellow(%logger{20}): %msg%n%throwable"  # Формат для консольного вывода
+  file:
+    name: logs/myapp.log                # Путь к файлу логов, где будет записываться журнал
